@@ -6,6 +6,15 @@ import (
 	"path"
 )
 
+func ConfigureGit() (err error) {
+	err = exec.Command("git", "config", "--global", "user.name", "YOUR USER NAME").Run()
+	if err != nil {
+		return
+	}
+	err = exec.Command("git", "config", "--global", "user.email", "YOUR EMAIL").Run()
+	return
+}
+
 func CreateDir(baseDir string, name string, initGit bool) (err error) {
 	dirName := path.Join(baseDir, name)
 	err = os.MkdirAll(dirName, os.ModePerm)
