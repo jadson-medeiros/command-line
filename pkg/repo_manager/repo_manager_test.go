@@ -6,7 +6,7 @@ import (
 	"path"
 	"strings"
 
-	. "../helpers"
+	. "github.com/jadson-medeiros/command-line/pkg/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
