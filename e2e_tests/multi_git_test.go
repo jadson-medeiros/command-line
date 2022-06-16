@@ -88,4 +88,18 @@ var _ = Describe("multi-git e2e tests", func() {
 			Ω(count).Should(Equal(2))
 		})
 	})
+
+	Context("Tests for non-git directories", func() {
+		It("Should fail git status", func() {
+			err = CreateDir(baseDir, "dir-1", false)
+			Ω(err).Should(BeNil())
+			err = CreateDir(baseDir, "dir-2", false)
+			Ω(err).Should(BeNil())
+			repoList = "dir-1,dir-2"
+
+			output, err := RunMultiGit("status", false, baseDir, repoList)
+			Ω(err).Should(BeNil())
+			Ω(output).Should(ContainSubstring("fatal: not a git repository"))
+		})
+	})
 })
