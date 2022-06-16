@@ -1,6 +1,7 @@
 package e2e_tests
 
 import (
+	"fmt"
 	"os"
 
 	. "github.com/jadson-medeiros/command-line/pkg/helpers"
@@ -13,6 +14,7 @@ const baseDir = "/tmp/multi-git"
 var _ = Describe("multi-git e2e tests", func() {
 	var err error
 
+	fmt.Println("*** e2e_tests starting")
 	removeAll := func() {
 		err = os.RemoveAll(baseDir)
 		Ω(err).Should(BeNil())
