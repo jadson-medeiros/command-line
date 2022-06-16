@@ -102,4 +102,40 @@ var _ = Describe("multi-git e2e tests", func() {
 			Ω(output).Should(ContainSubstring("fatal: not a git repository"))
 		})
 	})
+
+	Context("Tests for ignoreErrors flag", func() {
+		Context("First directory is invalid", func() {
+			When("ignoreErrors is true", func() {
+				It("git status should succeed for the second directory", func() {
+					err = CreateDir(baseDir, "dir-1", false)
+					Ω(err).Should(BeNil())
+					err = CreateDir(baseDir, "dir-2", true)
+					Ω(err).Should(BeNil())
+					repoList = "dir-1,dir-2"
+
+					output, err := RunMultiGit("status", true, baseDir, repoList)
+					Ω(err).Should(BeNil())
+
+					Ω(output).Should(ContainSubstring("[dir-1]: git status\nfatal: not a git repository"))
+					Ω(output).Should(ContainSubstring("[dir-2]: git status\nOn branch master"))
+				})
+			})
+
+			When("ignoreErrors is false", func() {
+				It("Should fail on first directory and bail out", func() {
+					err = CreateDir(baseDir, "dir-1", false)
+					Ω(err).Should(BeNil())
+					err = CreateDir(baseDir, "dir-2", true)
+					Ω(err).Should(BeNil())
+					repoList = "dir-1,dir-2"
+
+					output, err := RunMultiGit("status", false, baseDir, repoList)
+					Ω(err).Should(BeNil())
+
+					Ω(output).Should(ContainSubstring("[dir-1]: git status\nfatal: not a git repository"))
+					Ω(output).ShouldNot(ContainSubstring("[dir-2]"))
+				})
+			})
+		})
+	})
 })
