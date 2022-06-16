@@ -3,6 +3,7 @@ package e2e_tests
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	. "github.com/jadson-medeiros/command-line/pkg/helpers"
 	. "github.com/onsi/ginkgo"
@@ -42,6 +43,49 @@ var _ = Describe("multi-git e2e tests", func() {
 			output, err := RunMultiGit("status", false, baseDir, repoList)
 			Ω(err).ShouldNot(BeNil())
 			Ω(output).Should(ContainSubstring("repo list can't be empty"))
+		})
+	})
+
+	Context("Tests for success cases", func() {
+		It("Should do git init successfully", func() {
+			err = CreateDir(baseDir, "dir-1", false)
+			Ω(err).Should(BeNil())
+			err = CreateDir(baseDir, "dir-2", false)
+			Ω(err).Should(BeNil())
+			repoList = "dir-1,dir-2"
+
+			output, err := RunMultiGit("init", false, baseDir, repoList)
+			Ω(err).Should(BeNil())
+			fmt.Println(output)
+			count := strings.Count(output, "Initialized empty Git repository")
+			Ω(count).Should(Equal(2))
+		})
+
+		It("Should do git status successfully for git directories", func() {
+			err = CreateDir(baseDir, "dir-1", true)
+			Ω(err).Should(BeNil())
+			err = CreateDir(baseDir, "dir-2", true)
+			Ω(err).Should(BeNil())
+			repoList = "dir-1,dir-2"
+
+			output, err := RunMultiGit("status", false, baseDir, repoList)
+			Ω(err).Should(BeNil())
+			count := strings.Count(output, "nothing to commit")
+			Ω(count).Should(Equal(2))
+		})
+
+		It("Should create branches successfully", func() {
+			err = CreateDir(baseDir, "dir-1", true)
+			Ω(err).Should(BeNil())
+			err = CreateDir(baseDir, "dir-2", true)
+			Ω(err).Should(BeNil())
+			repoList = "dir-1,dir-2"
+
+			output, err := RunMultiGit("checkout -b test-branch", false, baseDir, repoList)
+			Ω(err).Should(BeNil())
+
+			count := strings.Count(output, "Switched to a new branch 'test-branch'")
+			Ω(count).Should(Equal(2))
 		})
 	})
 })
