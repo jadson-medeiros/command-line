@@ -11,6 +11,8 @@ import (
 
 const baseDir = "/tmp/multi-git"
 
+var repoList string
+
 var _ = Describe("multi-git e2e tests", func() {
 	var err error
 
@@ -27,4 +29,19 @@ var _ = Describe("multi-git e2e tests", func() {
 	})
 
 	AfterSuite(removeAll)
+
+	Context("Tests for empty/undefined environment failure cases", func() {
+		It("Should fail with invalid base dir", func() {
+			output, err := RunMultiGit("status", false, "/no-such-dir", repoList)
+			Ω(err).ShouldNot(BeNil())
+			suffix := "base dir: '/no-such-dir/' doesn't exist\n"
+			Ω(output).Should(HaveSuffix(suffix))
+		})
+
+		It("Should fail with empty repo list", func() {
+			output, err := RunMultiGit("status", false, baseDir, repoList)
+			Ω(err).ShouldNot(BeNil())
+			Ω(output).Should(ContainSubstring("repo list can't be empty"))
+		})
+	})
 })
