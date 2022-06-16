@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -70,36 +69,24 @@ func AddFiles(baseDir string, dirName string, commit bool, filenames ...string) 
 	return
 }
 
-func RunMultiGit(command string, ignoreErrors bool, mgRoot string, mgRepos string, useConfigFile bool) (output string, err error) {
-	out, err := exec.Command("which", "multi-git").CombinedOutput()
+func RunMultiGit(command string, ignoreErrors bool, mgRoot string, mgRepos string) (output string, err error) {
+	out, err := exec.Command("which", "mg").CombinedOutput()
 	if err != nil {
 		return
 	}
 
 	if len(out) == 0 {
-		err = errors.New("multi-git is not in the PATH")
+		err = errors.New("mg is not in the PATH")
 		return
 	}
 
-	components := []string{command}
-	env := os.Environ()
-	if useConfigFile {
-		configFile := path.Join(mgRoot, "multi-git-test-config.toml")
-		data := fmt.Sprintf("root = \"%s\"\nrepos = \"%s\"\nignore-errors = %v\n", mgRoot, mgRepos, ignoreErrors)
-		err = ioutil.WriteFile(configFile, []byte(data), 0644)
-		if err != nil {
-			return
-		}
-		components = append(components, "--config", configFile)
-	} else {
-		if ignoreErrors {
-			components = append(components, "--ignore-errors")
-		}
-		env = append(env, "MG_ROOT="+mgRoot, "MG_REPOS="+mgRepos)
+	components := []string{"--command", command}
+	if ignoreErrors {
+		components = append(components, "--ignore-errors")
 	}
-
-	cmd := exec.Command("multi-git", components...)
-	cmd.Env = env
+	cmd := exec.Command("mg", components...)
+	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env, "MG_ROOT="+mgRoot, "MG_REPOS="+mgRepos)
 	out, err = cmd.CombinedOutput()
 	output = string(out)
 	return
