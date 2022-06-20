@@ -12,6 +12,7 @@ import (
 )
 
 func main() {
+	fmt.Println("**** main() start")
 	command := flag.String("command", "", "The git command")
 	ignoreErros := flag.Bool(
 		"ignore-errors",
