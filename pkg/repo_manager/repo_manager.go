@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
@@ -13,14 +14,18 @@ type RepoManager struct {
 	ignoreErrors bool
 }
 
-func NewRepoManager(baseDir string,
-	repoNames []string,
-	ignoreErrors bool) (repoManager *RepoManager, err error) {
+func NewRepoManager(baseDir string, repoNames []string, ignoreErrors bool) (repoManager *RepoManager, err error) {
 	_, err = os.Stat(baseDir)
+
 	if err != nil {
 		if os.IsNotExist(err) {
 			err = errors.New(fmt.Sprintf("base dir: '%s' doesn't exist", baseDir))
 		}
+		return
+	}
+
+	baseDir, err = filepath.Abs(baseDir)
+	if err != nil {
 		return
 	}
 
@@ -36,11 +41,8 @@ func NewRepoManager(baseDir string,
 	repoManager = &RepoManager{
 		ignoreErrors: ignoreErrors,
 	}
+
 	for _, r := range repoNames {
-		if r == "" {
-			err = errors.New("repo name can't be empty")
-			return
-		}
 		path := baseDir + r
 		repoManager.repos = append(repoManager.repos, path)
 	}
@@ -54,8 +56,10 @@ func (m *RepoManager) GetRepos() []string {
 
 func (m *RepoManager) Exec(cmd string) (output map[string]string, err error) {
 	output = map[string]string{}
+
 	var components []string
 	var multiWord []string
+
 	for _, component := range strings.Split(cmd, " ") {
 		if strings.HasPrefix(component, "\"") {
 			multiWord = append(multiWord, component[1:])
@@ -81,6 +85,7 @@ func (m *RepoManager) Exec(cmd string) (output map[string]string, err error) {
 	defer os.Chdir(wd)
 
 	var out []byte
+
 	for _, r := range m.repos {
 		// Go to the repo's directory
 		err = os.Chdir(r)
@@ -101,5 +106,6 @@ func (m *RepoManager) Exec(cmd string) (output map[string]string, err error) {
 			return
 		}
 	}
+
 	return
 }
