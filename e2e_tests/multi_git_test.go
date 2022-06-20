@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-const baseDir = "/tmp/multi-git"
+const baseDir = "/tmp/test-multi-git"
 
 var repoList string
 
@@ -24,6 +24,8 @@ var _ = Describe("multi-git e2e tests", func() {
 	}
 
 	BeforeEach(func() {
+		err = ConfigureGit()
+		Ω(err).Should(BeNil())
 		removeAll()
 		err = CreateDir(baseDir, "", false)
 		Ω(err).Should(BeNil())
