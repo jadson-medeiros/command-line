@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	. "github.com/jadson-medeiros/command-line/pkg/helpers"
@@ -11,7 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-const baseDir = "/tmp/test-multi-git"
+var baseDir string
 
 var repoList = []string{}
 
@@ -129,3 +130,7 @@ var _ = Describe("Repo manager tests", func() {
 		})
 	})
 })
+
+func init() {
+	baseDir, _ = filepath.Abs("tmp/test-command-line")
+}
