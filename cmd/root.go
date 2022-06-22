@@ -7,19 +7,24 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// rootCmd represents the base command when called without any sub-commands
 var rootCmd = &cobra.Command{
-	Use:   "foo",
-	Short: "Foo is a cool program",
-	Long: `Foo is an extremely cool program.
-         It will make your life easier and fun`,
+	Use:   "multi-git",
+	Short: "Runs git commands over multiple repos",
+	Long: `Runs git commands over multiple repos.
+
+Requires the following environment variables defined:   
+MG_ROOT: root directory of target git repositories
+MG_REPOS: list of repository names to operate on`,
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		// This is where you implement the command
-		fmt.Println("Cobra running...")
+
 	},
 }
 
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
+	err := rootCmd.Execute()
+	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
